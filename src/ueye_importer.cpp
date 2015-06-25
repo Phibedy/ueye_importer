@@ -21,7 +21,7 @@ bool UeyeImporter::initialize() {
     camera->info();
     
     // Set config
-    config = getConfig();
+    config = getConfig("ueye");
     
     camera->setNumBuffers( config->get<size_t>("num_buffers") );
     
