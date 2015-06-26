@@ -32,7 +32,7 @@ bool UeyeCamera::open()
     // set camera handle id (0 = auto)
     status = is_InitCamera(&handle, NULL);
     CHECK_STATUS("InitCamera")
-    return ( IS_SUCCESS == status );
+            return ( IS_SUCCESS == status );
 }
 
 bool UeyeCamera::close()
@@ -42,12 +42,12 @@ bool UeyeCamera::close()
         // not opened
         return false;
     }
-        
+
     deinit();
     
     status = is_ExitCamera(handle);
     CHECK_STATUS("ExitCamera")
-    if( IS_SUCCESS == status )
+            if( IS_SUCCESS == status )
     {
         handle = 0;
         return true;
@@ -78,7 +78,7 @@ bool UeyeCamera::init()
     {
         width  = size.s32Width;
         height = size.s32Height;
-    } 
+    }
     else
     {
         logger.error() << "Error reading image size and format from camera";
@@ -92,19 +92,19 @@ bool UeyeCamera::init()
         INT id;
         status = is_AllocImageMem(handle, width, height, getBPP() * 8, &ptr, &id);
         CHECK_STATUS("AllocImageMem")
-        
-        status = is_AddToSequence(handle, ptr, id);
+
+                status = is_AddToSequence(handle, ptr, id);
         CHECK_STATUS("AddToSequence")
-        
-        // save reference to new buffer
-        buffers[ptr] = id;
+
+                // save reference to new buffer
+                buffers[ptr] = id;
     }
     
     // Reset capture status
     status = is_CaptureStatus(handle, IS_CAPTURE_STATUS_INFO_CMD_RESET, NULL, 0);
     CHECK_STATUS("ResetCaptureStatus")
-    
-    initialized = true;
+
+            initialized = true;
     return true;
 }
 
@@ -124,9 +124,9 @@ bool UeyeCamera::deinit()
     // Clear buffers
     status = is_ClearSequence(handle);
     CHECK_STATUS("ClearSequence")
-    
-    // Dealloc buffers
-    for( auto& buf : buffers )
+
+            // Dealloc buffers
+            for( auto& buf : buffers )
     {
         status = is_FreeImageMem(handle, buf.first /* ptr */, buf.second /* id */);
         CHECK_STATUS("FreeImageMem")
@@ -136,11 +136,11 @@ bool UeyeCamera::deinit()
     // Disable events
     status = is_DisableEvent(handle, IS_SET_EVENT_FRAME);
     CHECK_STATUS("DisableFrameEvent")
-    
-    // status = is_DisableEvent(handle, IS_SET_EVENT_CAPTURE_STATUS);
-    // CHECK_STATUS("DisableCaptureStatusEvent")
-    
-    initialized = false;
+
+            // status = is_DisableEvent(handle, IS_SET_EVENT_CAPTURE_STATUS);
+            // CHECK_STATUS("DisableCaptureStatusEvent")
+
+            initialized = false;
     
     return true;
 }
@@ -151,8 +151,8 @@ void UeyeCamera::initParameters()
     
     status = is_SetColorMode(handle, format);
     CHECK_STATUS("SetColorMode")
-    
-    is_SetExternalTrigger(handle, IS_SET_TRIGGER_OFF);
+
+            is_SetExternalTrigger(handle, IS_SET_TRIGGER_OFF);
     CHECK_STATUS("SetExternalTrigger")
 }
 
@@ -160,12 +160,12 @@ size_t UeyeCamera::getBPP()
 {
     switch( format )
     {
-        // TODO: list all formats
-        case IS_CM_MONO8:
-            return 1;
-        default:
-            // unknown
-            return 0;
+    // TODO: list all formats
+    case IS_CM_MONO8:
+        return 1;
+    default:
+        // unknown
+        return 0;
     }
 }
 
@@ -173,14 +173,14 @@ bool UeyeCamera::start()
 {
     status = is_CaptureVideo(handle, IS_DONT_WAIT);
     CHECK_STATUS("CaptureVideo")
-    if( IS_SUCCESS != status )
+            if( IS_SUCCESS != status )
     {
         return false;
     }
     
     status = is_EnableEvent(handle, IS_SET_EVENT_FRAME);
     CHECK_STATUS("EnableFrameEvent")
-    if( IS_SUCCESS != status )
+            if( IS_SUCCESS != status )
     {
         return false;
     }
@@ -212,8 +212,8 @@ bool UeyeCamera::stop()
     
     status = is_StopLiveVideo(handle, 0);
     CHECK_STATUS("StopLiveVideo")
-    
-    if( IS_SUCCESS != status )
+
+            if( IS_SUCCESS != status )
     {
         return false;
     }
@@ -253,53 +253,46 @@ bool UeyeCamera::captureImage( lms::imaging::Image& image )
     status = is_GetActSeqBuf(handle, NULL, NULL, &ptr);
 #ifdef UEYE_DEBUG
     CHECK_STATUS("GetActSeqBuf")
-#endif
+        #endif
 
-    if( IS_SUCCESS == status && NULL != ptr && buffers.find(ptr) != buffers.end() )
+            if( IS_SUCCESS == status && NULL != ptr && buffers.find(ptr) != buffers.end() )
     {
         status = is_LockSeqBuf(handle, IS_IGNORE_PARAMETER, ptr);
 #ifdef UEYE_DEBUG
         CHECK_STATUS("LockSeqBuf")
-#endif
+        #endif
 
-        status = is_CopyImageMem(handle, ptr, buffers[ptr], (char*)image.data());
+                status = is_CopyImageMem(handle, ptr, buffers[ptr], (char*)image.data());
 #ifdef UEYE_DEBUG
         CHECK_STATUS("CopyImageMem")
-#endif
+        #endif
 
-        status = is_UnlockSeqBuf(handle, IS_IGNORE_PARAMETER, ptr);
+                status = is_UnlockSeqBuf(handle, IS_IGNORE_PARAMETER, ptr);
 #ifdef UEYE_DEBUG
         CHECK_STATUS("UnlockSeqBuf")
-#endif
-        
-        return true;
+        #endif
+
+                return true;
     }
     
     return false;
 }
 
-bool UeyeCamera::waitForFrame(float timeOut)
-{
-    if( frame_thread.joinable() )
-    {
-        frame_thread.join();
-    }
-    //TODO hack
+bool UeyeCamera::waitForFrame(float timeOut){
+
     lms::extra::PrecisionTime start = lms::extra::PrecisionTime::now();
-    bool failed = false;
-    frame_thread = std::thread([this,&failed,&start,&timeOut](){
-        INT ret = 0;
-        do {
-            ret = is_WaitEvent( this->handle, IS_SET_EVENT_FRAME, 100 );
-            if((lms::extra::PrecisionTime::now() - start).toFloat<std::milli, double>() > timeOut){
-                //TODO error werfen, was auch immer
-                std::cout<<"CAM FAILED in waitForFrame"<<std::endl;
-                failed = true;
-                break;
-            }
-        } while( IS_TIMED_OUT == ret && this->capturing );
-    });
-    return !failed;
+    bool success = true;
+    INT ret = 0;
+    do {
+        //std::cout<<"waiting forIMAGE"<<std::endl;
+        ret = is_WaitEvent( this->handle, IS_SET_EVENT_FRAME, 100 );
+        float res =(lms::extra::PrecisionTime::now() - start).toFloat<std::milli, double>();
+        if( res > timeOut){
+            success = false;
+            break;
+        }
+    } while( IS_TIMED_OUT == ret && this->capturing );
+    return success;
 }
 
 bool UeyeCamera::setAOI(size_t width, size_t height, size_t offsetX, size_t offsetY)
@@ -315,22 +308,22 @@ bool UeyeCamera::setAOI(size_t width, size_t height, size_t offsetX, size_t offs
     }
     
     IS_RECT rect;
- 
+
     rect.s32X       = offsetX;
     rect.s32Y       = offsetY;
     rect.s32Width   = width;
     rect.s32Height  = height;
- 
+
     status = is_AOI( handle, IS_AOI_IMAGE_SET_AOI, (void*)&rect, sizeof(rect));
     CHECK_STATUS("AOI")
-    return ( IS_SUCCESS == status );
+            return ( IS_SUCCESS == status );
 }
 
 bool UeyeCamera::setPixelClock( unsigned int clock )
 {
     status = is_PixelClock(handle, IS_PIXELCLOCK_CMD_SET, (void*)&clock, sizeof(clock));
     CHECK_STATUS("PixelClock")
-    return ( IS_SUCCESS == status );
+            return ( IS_SUCCESS == status );
 }
 
 double UeyeCamera::setExposure(double exposure)
@@ -338,8 +331,8 @@ double UeyeCamera::setExposure(double exposure)
     double exposureParam = exposure;
     status = is_Exposure(handle, IS_EXPOSURE_CMD_SET_EXPOSURE, (void*)&exposureParam, sizeof(exposureParam));
     CHECK_STATUS("Exposure")
-    
-    if( IS_SUCCESS == status )
+
+            if( IS_SUCCESS == status )
     {
         return exposureParam;
     }
@@ -351,8 +344,8 @@ double UeyeCamera::setFrameRate(double fps)
     double actual;
     status = is_SetFrameRate(handle, fps, &actual);
     CHECK_STATUS("SetFrameRate")
-    
-    if( IS_SUCCESS == status )
+
+            if( IS_SUCCESS == status )
     {
         return actual;
     }
@@ -363,8 +356,8 @@ bool UeyeCamera::setHardwareGamma(bool enable)
 {
     status = is_SetHardwareGamma(handle, enable ? IS_SET_HW_GAMMA_ON : IS_SET_HW_GAMMA_OFF);
     CHECK_STATUS("SetHardwareGamma")
-    
-    return ( IS_SUCCESS == status );
+
+            return ( IS_SUCCESS == status );
 }
 
 bool UeyeCamera::setGamma(double gamma)
@@ -372,16 +365,16 @@ bool UeyeCamera::setGamma(double gamma)
     INT value = static_cast<INT>( gamma * 100.0 );
     status = is_Gamma(handle, IS_GAMMA_CMD_SET, (void*)&value, sizeof(value));
     CHECK_STATUS("Gamma")
-    
-    return ( IS_SUCCESS == status );
+
+            return ( IS_SUCCESS == status );
 }
 
 bool UeyeCamera::setGainBoost(bool enable)
 {
     status = is_SetGainBoost(handle, enable ? IS_SET_GAINBOOST_ON : IS_SET_GAINBOOST_OFF);
     CHECK_STATUS("SetGainBoost")
-    
-    return ( IS_SUCCESS == status );
+
+            return ( IS_SUCCESS == status );
 }
 
 bool UeyeCamera::setAutoGain()
@@ -393,24 +386,24 @@ bool UeyeCamera::setGain(int value)
 {
     status = is_SetHardwareGain(handle, value, IS_IGNORE_PARAMETER, IS_IGNORE_PARAMETER, IS_IGNORE_PARAMETER);
     CHECK_STATUS("SetHardwareGain")
-    
-    return ( IS_SUCCESS == status );
+
+            return ( IS_SUCCESS == status );
 }
 
 bool UeyeCamera::setGlobalShutter(bool enable)
 {
     status = is_SetGlobalShutter(handle, enable ? IS_SET_GLOBAL_SHUTTER_ON : IS_SET_GLOBAL_SHUTTER_OFF);
     CHECK_STATUS("SetGlobalShutter")
-    
-    return ( IS_SUCCESS == status );
+
+            return ( IS_SUCCESS == status );
 }
 
 bool UeyeCamera::setEdgeEnhancement(int level)
 {
     status = is_EdgeEnhancement(handle, IS_EDGE_ENHANCEMENT_CMD_SET, (void*)&level, sizeof(level));
     CHECK_STATUS("EdgeEnhancement")
-    
-    return ( IS_SUCCESS == status );
+
+            return ( IS_SUCCESS == status );
 }
 
 bool UeyeCamera::setBlacklevel(bool autolevel, int offset)
@@ -419,8 +412,8 @@ bool UeyeCamera::setBlacklevel(bool autolevel, int offset)
     INT mode = autolevel ? IS_AUTO_BLACKLEVEL_ON : IS_AUTO_BLACKLEVEL_OFF;
     status = is_Blacklevel(handle, IS_BLACKLEVEL_CMD_SET_MODE, (void*)&mode, sizeof(mode));
     CHECK_STATUS("Blacklevel mode")
-    
-    if( IS_SUCCESS != status )
+
+            if( IS_SUCCESS != status )
     {
         return false;
     }
@@ -428,8 +421,8 @@ bool UeyeCamera::setBlacklevel(bool autolevel, int offset)
     // set offset
     status = is_Blacklevel(handle, IS_BLACKLEVEL_CMD_SET_OFFSET, (void*)&offset, sizeof(offset));
     CHECK_STATUS("Blacklevel offset")
-    
-    return ( IS_SUCCESS == status );
+
+            return ( IS_SUCCESS == status );
 }
 
 void UeyeCamera::info()
@@ -437,8 +430,8 @@ void UeyeCamera::info()
     SENSORINFO data;
     status = is_GetSensorInfo(handle, &data);
     CHECK_STATUS("GetSensorInfo")
-    
-    if( IS_SUCCESS != status )
+
+            if( IS_SUCCESS != status )
     {
         return;
     }
@@ -457,8 +450,8 @@ void UeyeCamera::logCaptureStatus()
     UEYE_CAPTURE_STATUS_INFO captureStatus;
     status = is_CaptureStatus(handle, IS_CAPTURE_STATUS_INFO_CMD_GET, (void*)&captureStatus, sizeof(captureStatus));
     CHECK_STATUS("CaptureStatus")
-    
-    if( IS_SUCCESS != status )
+
+            if( IS_SUCCESS != status )
     {
         return;
     }
