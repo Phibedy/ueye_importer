@@ -31,7 +31,11 @@ public:
     bool stop();
 
     // Capture image
-    void waitForFrame();
+    /**
+     * @brief waitForFrame
+     * @return true if the capturing was successfull
+     */
+    bool waitForFrame(float timeOut = INFINITY);
     bool captureImage(lms::imaging::Image& image);
 
     // Info

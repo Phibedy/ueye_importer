@@ -1,6 +1,7 @@
 #include <iomanip>
 
 #include <lms/type/module_config.h>
+#include "lms/messaging.h"
 
 #include "ueye_importer.h"
 
@@ -94,7 +95,10 @@ bool UeyeImporter::cycle () {
     logger.debug("cycle") << "uEyeImporter::cycle";
     
     // Wait for new frame event...
-    camera->waitForFrame();
+    if(!camera->waitForFrame(config->get<float>("timeOut",20))){
+        messaging()->send("STOP_CAR","Stop it honey <3");
+        std::cout<<"CAM FAILED HARD BRO"<<std::endl;
+    }
     
     if(!camera->captureImage( *imagePtr ))
     {

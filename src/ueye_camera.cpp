@@ -1,4 +1,5 @@
 #include "ueye_camera.h"
+#include "lms/extra/time.h"
 
 #define CHECK_STATUS(NAME) if( IS_SUCCESS != status ) { logger.error(NAME) << getError(); }
 
@@ -277,19 +278,28 @@ bool UeyeCamera::captureImage( lms::imaging::Image& image )
     return false;
 }
 
-void UeyeCamera::waitForFrame()
+bool UeyeCamera::waitForFrame(float timeOut)
 {
     if( frame_thread.joinable() )
     {
         frame_thread.join();
     }
-    
-    frame_thread = std::thread([this](){
+    //TODO hack
+    lms::extra::PrecisionTime start = lms::extra::PrecisionTime::now();
+    bool failed = false;
+    frame_thread = std::thread([this,&failed,&start,&timeOut](){
         INT ret = 0;
         do {
             ret = is_WaitEvent( this->handle, IS_SET_EVENT_FRAME, 100 );
+            if((lms::extra::PrecisionTime::now() - start).toFloat<std::milli, double>() > timeOut){
+                //TODO error werfen, was auch immer
+                std::cout<<"CAM FAILED in waitForFrame"<<std::endl;
+                failed = true;
+                break;
+            }
         } while( IS_TIMED_OUT == ret && this->capturing );
     });
+    return !failed;
 }
 
 bool UeyeCamera::setAOI(size_t width, size_t height, size_t offsetX, size_t offsetY)
