@@ -425,6 +425,43 @@ bool UeyeCamera::setBlacklevel(bool autolevel, int offset)
             return ( IS_SUCCESS == status );
 }
 
+bool UeyeCamera::setHDR(bool enable)
+{
+    INT mode = enable ? IS_ENABLE_HDR : IS_DISABLE_HDR;
+    status = is_EnableHdr(handle, mode);
+    
+    CHECK_STATUS("HDR enable")
+    return ( IS_SUCCESS == status );
+}
+
+bool UeyeCamera::setHDRKneepoints( const std::vector< std::pair<double, double> >& kneepoints )
+{
+    KNEEPOINTARRAY array;
+    
+    INT numPoints = kneepoints.size();
+    if( numPoints > 10)
+    {
+        logger.warn("setHDRKneepoints") << "Maxmimum number of HDR points limited to 10 (requested: " << kneepoints.size() << ")";
+        numPoints = 10;
+    }
+    
+    auto it = kneepoints.begin();
+    
+    // Fill KNEEPOINTARRAY
+    array.NumberOfUsedKneepoints = numPoints;
+    for( INT i = 0; i < numPoints; i++ )
+    {
+        KNEEPOINT& k = array.Kneepoint[i];
+        k.x = it->first;
+        k.y = it->second;
+        ++it;
+    }
+    
+    status = is_SetHdrKneepoints(handle, &array, numPoints);
+    CHECK_STATUS("HDR Kneepoints")
+    return ( IS_SUCCESS == status );
+}
+
 void UeyeCamera::info()
 {
     SENSORINFO data;

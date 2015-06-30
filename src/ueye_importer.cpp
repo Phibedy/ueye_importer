@@ -53,7 +53,42 @@ bool UeyeImporter::initialize() {
     
     camera->setEdgeEnhancement( config->get<int>("edge_enhancement") );
     
-    // TODO: fancy HDR stuff
+    // HDR mode
+    {
+        auto kneepointsX = config->getArray<double>("hdr_kneepoints_x");
+        auto kneepointsY = config->getArray<double>("hdr_kneepoints_y");
+        
+        if( kneepointsX.size() != kneepointsY.size() )
+        {
+            logger.warn("hdr_kneepoints")
+                << "Number of X and Y values for HDR kneepoints differ!"
+                << "( x: " << kneepointsX.size() << ", y:" << kneepointsY.size() << " )";
+        }
+        
+        std::vector< std::pair<double, double> > kneepoints;
+        
+        auto xIt = kneepointsX.begin();
+        auto yIt = kneepointsY.begin();
+        
+        while( xIt != kneepointsX.end() && yIt != kneepointsY.end() )
+        {
+            kneepoints.push_back( std::make_pair( *xIt++, *yIt++ ) );
+        }
+        
+        if( kneepoints.size() > 0 )
+        {
+            // Set Kneepoints...
+            camera->setHDRKneepoints( kneepoints );
+            
+            // ... and enable HDR
+            camera->setHDR( true );
+        }
+        else
+        {
+            // Disable HDR
+            camera->setHDR( false );
+        }
+    }
     
     // Initialize buffers and stuff
     camera->init();
