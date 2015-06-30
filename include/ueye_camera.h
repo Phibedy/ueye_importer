@@ -61,7 +61,8 @@ public:
     bool setBlacklevel(bool autolevel, int offset);
     bool setEdgeEnhancement(int level);
     
-    // TODO: HDR mode
+    bool setHDR( bool enable );
+    bool setHDRKneepoints( const std::vector< std::pair<double, double> >& kneepoints );
     
     // Debug info
     void info();

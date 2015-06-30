@@ -19,3 +19,5 @@ blacklevel_offset = 0
 
 edge_enhancement = 0
 
+hdr_kneepoints_x = 
+hdr_kneepoints_y = 
