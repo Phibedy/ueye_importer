@@ -11,7 +11,7 @@ bool UeyeImporter::initialize() {
     logger.info() << "Init: UeyeImporter";
     
     // init camera
-    camera = new UeyeCamera(&logger);
+    camera = new UeyeCamera(logger);
     
     if(!camera->open()){
         return false;

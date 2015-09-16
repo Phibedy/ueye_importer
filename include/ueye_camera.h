@@ -15,7 +15,7 @@ namespace lms_ueye_importer
 class UeyeCamera
 {
 public:
-    UeyeCamera(lms::logging::Logger *rootLogger);
+    UeyeCamera(lms::logging::Logger &logger);
     ~UeyeCamera();
     
     // Open camera device
@@ -74,7 +74,7 @@ public:
     
 protected:
     
-    lms::logging::ChildLogger logger;
+    lms::logging::Logger& logger;
     
     HIDS handle;
     INT status;

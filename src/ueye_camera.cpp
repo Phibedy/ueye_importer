@@ -8,8 +8,8 @@ namespace lms_ueye_importer
 
 std::unordered_map<INT, std::string> UeyeCamera::errorCodes;
 
-UeyeCamera::UeyeCamera(lms::logging::Logger *rootLogger)  :
-    logger("uEye", rootLogger),
+UeyeCamera::UeyeCamera(lms::logging::Logger &logger)  :
+    logger(logger),
     handle(0),
     status(IS_SUCCESS),
     format(IS_CM_MONO8),
