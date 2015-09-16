@@ -15,5 +15,7 @@ include_directories("include")
 # Debug flag
 # add_definitions(-DUEYE_DEBUG)
 
-add_library ( ueye_importer MODULE ${SOURCES} ${HEADERS})
-target_link_libraries(ueye_importer PRIVATE lmscore imaging ueye_api)
+if(NOT APPLE)
+    add_library ( ueye_importer MODULE ${SOURCES} ${HEADERS})
+    target_link_libraries(ueye_importer PRIVATE lmscore imaging ueye_api)
+endif()
