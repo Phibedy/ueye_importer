@@ -2,7 +2,7 @@
 
 #include <lms/datamanager.h>
 #include <lms/module.h>
-#include <lms/type/module_config.h>
+#include <lms/module_config.h>
 #include <lms/imaging/image.h>
 
 #include "ueye_camera.h"
@@ -19,7 +19,7 @@ public:
 
 protected:
 
-    const lms::type::ModuleConfig* config;
+    const lms::ModuleConfig* config;
     lms::imaging::Image* imagePtr;
     
     UeyeCamera* camera;
