@@ -21,42 +21,40 @@ bool UeyeImporter::initialize() {
     camera->info();
     
     // Set config
-    config = getConfig();
-    
-    camera->setNumBuffers( config->get<size_t>("num_buffers") );
+    camera->setNumBuffers( config().get<size_t>("num_buffers") );
     
     camera->setAOI(
-        config->get<size_t>("width"),
-        config->get<size_t>("height"),
-        config->get<size_t>("offset_x"),
-        config->get<size_t>("offset_y")
+        config().get<size_t>("width"),
+        config().get<size_t>("height"),
+        config().get<size_t>("offset_x"),
+        config().get<size_t>("offset_y")
     );
-    camera->setPixelClock( config->get<int>("pixelclock") );
-    auto fps = camera->setFrameRate( config->get<double>("framerate") );
-    auto exposure = camera->setExposure( config->get<double>("exposure") );
-    camera->setHardwareGamma( config->get<bool>("hardware_gamma") );
-    camera->setGamma( config->get<double>("gamma") );
-    camera->setGainBoost( config->get<bool>("gain_boost") );
+    camera->setPixelClock( config().get<int>("pixelclock") );
+    auto fps = camera->setFrameRate( config().get<double>("framerate") );
+    auto exposure = camera->setExposure( config().get<double>("exposure") );
+    camera->setHardwareGamma( config().get<bool>("hardware_gamma") );
+    camera->setGamma( config().get<double>("gamma") );
+    camera->setGainBoost( config().get<bool>("gain_boost") );
     
-    if( config->get<bool>("gain_auto") )
+    if( config().get<bool>("gain_auto") )
     {
         camera->setAutoGain();
     } else {
-        camera->setGain( config->get<int>("gain") );
+        camera->setGain( config().get<int>("gain") );
     }
     
-    // camera->setGlobalShutter( config->get<bool>("global_shutter") );
+    // camera->setGlobalShutter( config().get<bool>("global_shutter") );
     camera->setBlacklevel(
-        config->get<bool>("blacklevel_auto"),
-        config->get<int>("blacklevel_offset")
+        config().get<bool>("blacklevel_auto"),
+        config().get<int>("blacklevel_offset")
     );
     
-    camera->setEdgeEnhancement( config->get<int>("edge_enhancement") );
+    camera->setEdgeEnhancement( config().get<int>("edge_enhancement") );
     
     // HDR mode
     {
-        auto kneepointsX = config->getArray<double>("hdr_kneepoints_x");
-        auto kneepointsY = config->getArray<double>("hdr_kneepoints_y");
+        auto kneepointsX = config().getArray<double>("hdr_kneepoints_x");
+        auto kneepointsY = config().getArray<double>("hdr_kneepoints_y");
         
         if( kneepointsX.size() != kneepointsY.size() )
         {
@@ -129,7 +127,7 @@ bool UeyeImporter::cycle () {
     logger.debug("cycle") << "uEyeImporter::cycle";
     
     // Wait for new frame event...
-    if(!camera->waitForFrame(config->get<float>("timeOut",20))){
+    if(!camera->waitForFrame(config().get<float>("timeOut",20))){
         messaging()->send("STOP_CAR","Stop it honey <3");
         std::cout<<"CAM FAILED HARD BRO"<<std::endl;
     }

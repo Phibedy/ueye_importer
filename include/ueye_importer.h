@@ -19,7 +19,6 @@ public:
 
 protected:
 
-    const lms::ModuleConfig* config;
     lms::WriteDataChannel<lms::imaging::Image> imagePtr;
     
     UeyeCamera* camera;
