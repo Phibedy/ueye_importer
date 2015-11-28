@@ -140,24 +140,25 @@ bool UeyeImporter::cycle () {
     return true;
 }
 
-void UeyeImporter::configsChanged() override {
+void UeyeImporter::configsChanged(){
     logger.info() << "ConfigsChanged: UeyeImporter";
 
     // Stop capturing before changing settings
-    camera->stop();
+    //camera->stop();
 
     // Print camera information
-    camera->info();
+    //camera->info();
 
     // Set config
     camera->setNumBuffers( config().get<size_t>("num_buffers") );
-
+    /*
     camera->setAOI(
         config().get<size_t>("width"),
         config().get<size_t>("height"),
         config().get<size_t>("offset_x"),
         config().get<size_t>("offset_y")
     );
+    */
     camera->setPixelClock( config().get<int>("pixelclock") );
     auto fps = camera->setFrameRate( config().get<double>("framerate") );
     auto exposure = camera->setExposure( config().get<double>("exposure") );
@@ -218,14 +219,14 @@ void UeyeImporter::configsChanged() override {
     }
 
     // Initialize buffers and stuff
-    camera->init();
+    //camera->init();
 
     // Get data channels with actual size and format
-    imagePtr = datamanager()->writeChannel<lms::imaging::Image>(this, "CAMERA_IMAGE");
-    imagePtr->resize(camera->getWidth(), camera->getHeight(), lms::imaging::Format::GREY);
+    //imagePtr = datamanager()->writeChannel<lms::imaging::Image>(this, "CAMERA_IMAGE");
+    //imagePtr->resize(camera->getWidth(), camera->getHeight(), lms::imaging::Format::GREY);writeChannel
 
     // Start capturing
-    camera->start();
+    //camera->start();
 
     logger.info()   << "Starting uEye Camera: "
                     << camera->getWidth() << "x" << camera->getHeight()
@@ -233,7 +234,6 @@ void UeyeImporter::configsChanged() override {
                     << " @ " << fps << " fps"
                     << " (exposure: " << exposure << " ms)";
 
-    return true;
 }
 
 }
