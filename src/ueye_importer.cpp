@@ -150,7 +150,7 @@ void UeyeImporter::configsChanged(){
     //camera->info();
 
     // Set config
-    camera->setNumBuffers( config().get<size_t>("num_buffers") );
+    //camera->setNumBuffers( config().get<size_t>("num_buffers") );
     /*
     camera->setAOI(
         config().get<size_t>("width"),
