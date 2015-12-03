@@ -84,7 +84,7 @@ bool UeyeCamera::init()
         logger.error() << "Error reading image size and format from camera";
         return false;
     }
-    
+
     // Initialize buffers
     for( size_t i = 0; i < numBuffers; ++i )
     {
