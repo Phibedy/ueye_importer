@@ -2,7 +2,6 @@
 
 #include <unordered_map>
 #include <string>
-#include <thread>
 
 #include <lms/type/module_config.h>
 #include <lms/imaging/image.h>
@@ -89,10 +88,7 @@ protected:
     bool capturing;
     
     std::unordered_map<char*, INT> buffers;
-    
-    std::thread frame_thread;
-    // std::thread capture_status_thread;
-    
+
     static std::unordered_map<INT, std::string> errorCodes;
     
     size_t getBPP();

@@ -1,5 +1,4 @@
 #include <iomanip>
-
 #include <lms/type/module_config.h>
 #include "lms/messaging.h"
 
@@ -92,7 +91,7 @@ bool UeyeImporter::initialize() {
     camera->init();
     
     // Get data channels with actual size and format
-    imagePtr = datamanager()->writeChannel<lms::imaging::Image>(this, "CAMERA_IMAGE");
+    imagePtr = writeChannel<lms::imaging::Image>("CAMERA_IMAGE");
     imagePtr->resize(camera->getWidth(), camera->getHeight(), lms::imaging::Format::GREY);
     
     // Start capturing

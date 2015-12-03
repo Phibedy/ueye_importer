@@ -219,10 +219,6 @@ bool UeyeCamera::stop()
     }
     
     capturing = false;
-    
-    // Wait for frame thread to exit
-    frame_thread.join();
-    
     return true;
 }
 
