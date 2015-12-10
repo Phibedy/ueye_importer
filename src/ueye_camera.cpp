@@ -484,13 +484,11 @@ void UeyeCamera::logCaptureStatus()
     status = is_CaptureStatus(handle, IS_CAPTURE_STATUS_INFO_CMD_GET, (void*)&captureStatus, sizeof(captureStatus));
     CHECK_STATUS("CaptureStatus")
 
-            if( IS_SUCCESS != status )
-    {
+    if( IS_SUCCESS != status ){
         return;
     }
     
-    if( captureStatus.dwCapStatusCnt_Total == 0 )
-    {
+    if( captureStatus.dwCapStatusCnt_Total == 0 ){
         // no errors, nothing to log
         logger.info("captureStatus") << "No errors occured during capture";
         return;

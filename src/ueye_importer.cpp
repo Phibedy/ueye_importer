@@ -21,7 +21,7 @@ bool UeyeImporter::initialize() {
             camAvailable = true;
             break;
         }
-    }while(lms::extra::PrecisionTime::since(start).toFloat<std::milli>() < config().get<int>("timeout",0));
+    }while(lms::extra::PrecisionTime::since(start).toFloat<std::milli>() < config().get<int>("initTimeout",0));
     //return if the cam can't be accessed
     if(!camAvailable){
         return false;
@@ -129,21 +129,19 @@ bool UeyeImporter::deinitialize() {
 }
 
 bool UeyeImporter::cycle () {
-    if(!camera->isInitialized())
-    {
+    if(!camera->isInitialized()){
         return false;
     }
     
-    logger.debug("cycle") << "uEyeImporter::cycle";
-    
     // Wait for new frame event...
     if(!camera->waitForFrame(config().get<float>("timeOut",20))){
-        messaging()->send("STOP_CAR","Stop it honey <3");
-        std::cout<<"CAM FAILED HARD BRO"<<std::endl;
+        messaging()->send("CAM_FAILED","Stop it honey <3");
+        logger.error("cycle.waitForFrame")<<"Cam failed, code: "<<camera->getErrorCode()<<" Error: " <<camera->getError();
+        return false;
     }
     
-    if(!camera->captureImage( *imagePtr ))
-    {
+    if(!camera->captureImage( *imagePtr )){
+        logger.error("cycle.captureImage")<<"Cam failed, code: "<<camera->getErrorCode()<<" Error: " <<camera->getError();
         return false;
     }
     
