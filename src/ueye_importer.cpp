@@ -1,5 +1,6 @@
 #include <iomanip>
 #include <lms/type/module_config.h>
+#include <lms/extra/time.h>
 #include "lms/messaging.h"
 
 #include "ueye_importer.h"
