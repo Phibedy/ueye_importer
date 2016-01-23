@@ -1,6 +1,6 @@
 #include <iomanip>
-#include <lms/type/module_config.h>
-#include <lms/extra/time.h>
+#include <lms/config.h>
+#include <lms/time.h>
 #include "lms/messaging.h"
 
 #include "ueye_importer.h"
@@ -16,13 +16,13 @@ bool UeyeImporter::initialize() {
 
     //use the timeout to give the cam some time (needed for fast restart as the device will be busy from the last run (because of soem reason I don't know))
     bool camAvailable = false;
-    lms::extra::PrecisionTime start = lms::extra::PrecisionTime::now();
+    lms::Time start = lms::Time::now();
     do{
         if(camera->open()){
             camAvailable = true;
             break;
         }
-    }while(lms::extra::PrecisionTime::since(start).toFloat<std::milli>() < config().get<int>("initTimeout",0));
+    }while(lms::Time::since(start).toFloat<std::milli>() < config().get<int>("initTimeout",0));
     //return if the cam can't be accessed
     if(!camAvailable){
         return false;

@@ -1,5 +1,5 @@
 #include "ueye_camera.h"
-#include "lms/extra/time.h"
+#include "lms/time.h"
 
 #define CHECK_STATUS(NAME) if( IS_SUCCESS != status ) { logger.error(NAME) << getError(); }
 
@@ -276,13 +276,13 @@ bool UeyeCamera::captureImage( lms::imaging::Image& image )
 
 bool UeyeCamera::waitForFrame(float timeOut){
 
-    lms::extra::PrecisionTime start = lms::extra::PrecisionTime::now();
+    lms::Time start = lms::Time::now();
     bool success = true;
     INT ret = 0;
     do {
         //std::cout<<"waiting forIMAGE"<<std::endl;
         ret = is_WaitEvent( this->handle, IS_SET_EVENT_FRAME, 100 );
-        float res =(lms::extra::PrecisionTime::now() - start).toFloat<std::milli, double>();
+        float res =(lms::Time::now() - start).toFloat<std::milli, double>();
         if( res > timeOut){
             success = false;
             break;
