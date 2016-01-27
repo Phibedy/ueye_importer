@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lms/module.h>
-#include <lms/module_config.h>
+#include <lms/config.h>
 #include <lms/imaging/image.h>
 
 #include "ueye_camera.h"

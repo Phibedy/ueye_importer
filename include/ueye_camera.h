@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <string>
 
-#include <lms/type/module_config.h>
+#include <lms/config.h>
 #include <lms/imaging/image.h>
 #include <lms/logger.h>
 
