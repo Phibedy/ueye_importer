@@ -1,7 +1,7 @@
 #include "ueye_camera.h"
 #include "lms/time.h"
 
-#define CHECK_STATUS(NAME) if( IS_SUCCESS != status ) { logger.error(NAME) << getError(); }
+#define CHECK_STATUS(NAME) if( IS_SUCCESS != status ) { logger.error(NAME) << getError()<< " code: "<<getErrorCode(); }
 
 namespace lms_ueye_importer
 {
@@ -452,9 +452,31 @@ bool UeyeCamera::setHDRKneepoints( const std::vector< std::pair<double, double> 
         k.y = it->second;
         ++it;
     }
-    
+    //int hdr = -1;
+    //status = is_GetHdrMode(handle, &hdr);
+    //CHECK_STATUS("HDR 1")
+
+    //logger.error("HDR")<<hdr;
+
+    //status = is_EnableHdr(handle,1);
+    //CHECK_STATUS("HDR ...");
+    /*KNEEPOINTINFO ki[10];
+
+    for(int i = 0; i < 10; i++)
+        ki[i].NumberOfSupportedKneepoints = 0;
+
+    status = is_GetHdrKneepointInfo(handle,ki,10);
+    for(int i = 0; i < 10; i++)
+        logger.error("KNEE INFO")<<ki[i].NumberOfSupportedKneepoints;
+    CHECK_STATUS("HDR CHECK");
+    */
     status = is_SetHdrKneepoints(handle, &array, numPoints);
-    CHECK_STATUS("HDR Kneepoints")
+    CHECK_STATUS("HDR Kneepoints");
+/*
+            status = is_GetHdrMode(handle, &hdr);
+            logger.error("HDR")<<hdr;
+            CHECK_STATUS("HDR 2")
+            */
     return ( IS_SUCCESS == status );
 }
 
